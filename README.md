@@ -13,6 +13,6 @@
 pkg update -y && pkg upgrade -y
 pkg install python -y
 pip install requests
-git clone https://github.com/ඔබගේ-පරිශීලක-නම/DINUWA-Banning-Tool
-cd DINUWA-Banning-Tool
+git clone https://github.com/jfjdj556-eng/DINUWA-WA-BAN-TOOL.git
+cd DINUWA-WA-BAN-TOOL
 python dinuwa.py
